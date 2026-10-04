@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Box Push</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+  <div id="float">
+    <h1>Box Push</h1>
+    <p>
+      Level <span id="level"></span><br> Moves: <span id="moves"></span><span id="starTable"></span>
+      <hr>
+    <div style="display: flex;">
+      <div class="box" id="next" onclick="setup(lv);" title="Restart current level">↻</div>
+      <div class="box" title="Home" onclick="
+    document.getElementById('dark').style.display = 'inline-block';
+    document.getElementById('centerBox').style.display = 'inline-block';
+  ">
+        ⌂
+      </div>
+      <div class="box" title="Undo" id="undo"
+        onclick="boxes = JSON.parse(moved[moves - 1].boxes); bins = JSON.parse(moved[moves - 1].bins); player = JSON.parse(moved[moves - 1].player); moves -= 1; moved.pop(); ">
+        ↩︎</div>
+    </div>
+    </p>
+  </div>
+  <canvas id="canvas" width="1000" height="1000"></canvas>
+  <div id="dark"></div>
+  <div id="centerBox">
+    <h1>Box Push</h1>
+    <h2>Levels</h2>
+    <p>Flashing red levels indicates levels to complete.</p>
+    <div id="levels"></div>
+    <br>
+    <button class="bad" onclick="if(confirm('Sure to reset all data?')){localStorage.clear(); location.reload();}"
+      title="Resetting the game will detele all data and you'll lose access to levels.">Reset Game</button>
+    <hr>
+    <div id="instructions">
+      <h2>Game instructions</h2>
+      <p>Push the colored boxes to the corsponding colored destinations. Your goal is to push all the colored boxes to
+        their destinations to comlete a
+        level using as fewest moves as possible. You can only push one box at a time. Watch out for pits that can make
+        the
+        player and boxes fall down. High tiles blocks the player and boxes and slightly high tiles only blocks boxes.
+        Boxes that are not green cannot go on green squares. Boxes will move on conveyor belts if there is a clear path.
+        Box colors can be mixed when two boxes are pushed into flashing tiles.
+        <br>Controls:
+      <ul>
+        <li>y: Zoom in</li>
+        <li>i: Zoom out</li>
+        <li>u, j, h, k: Rotate camera</li>
+        <li>w: Move up</li>
+        <li>a: Move left</li>
+        <li>s: Move down</li>
+        <li>d: Move right</li>
+      </ul>
+
+      </p>
+
+    </div>
+    <hr>
+    <h2>File</h2>
+    Don't lose your progress! Download it to save it.
+    <h3>Export</h3>
+    <input type="text" value="boxPushProgress" placeholder="File name" id="fileName">
+    <button onclick="downloadProgress(document.getElementById('fileName').value);"
+      title="Download your progress here.">Export</button>
+
+    <h3>Import</h3>
+    Please upload the apporiate file to prevent errors. <br>
+    <input type="file" id="txtFileInput" accept=".txt" />
+    <pre id="fileContent"></pre>
+
+    <script>
+      document.getElementById('txtFileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const text = e.target.result;
+          var mode = 0;
+          var l = "";
+          var s = "";
+
+          for (var i = 0; i < text.length; i++) {
+            if (mode == 0) {
+              if (text.substring(i, i + 1) == "$") {
+                mode = 1;
+              } else {
+                l += text.substring(i, i + 1);
+              }
+            } else {
+              s += text.substring(i, i + 1);
+            }
+
+          }
+          try {
+            parseInt(l);
+            JSON.parse(s)[0];
+            localStorage.level = l.toString();
+            localStorage.stars = s.toString();
+          } catch {
+            alert("Error; please try again.");
+          }
+          window.location.reload();
+        };
+
+        reader.readAsText(file);
+
+      });
+    </script>
+  </div>
+  <div id="win">
+    <h1 id="comment">Win</h1>
+    <canvas id="stars" width="600" height="100"></canvas><br>
+    Moves: <span id="moves2"></span>
+    <br />
+    <br />
+    <span id="tip"></span>
+    <br />
+    <hr />
+    <br />
+    <div style="display: flex;">
+      <div class="box" title="Next level"
+        onclick="lv++; setup(lv); document.getElementById('win').style.display = 'none'; document.getElementById('dark').style.display = 'none';">
+        ▶▶
+      </div>
+      <div class="box" title="Restart current level"
+        onclick="setup(lv); document.getElementById('win').style.display = 'none'; document.getElementById('dark').style.display = 'none';">
+        ↻
+      </div>
+
+      <div class="box" title="Home"
+        onclick="document.getElementById('centerBox').style.display = 'inline-block'; document.getElementById('win').style.display = 'none';">
+        ⌂
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
